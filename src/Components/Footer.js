@@ -8,7 +8,9 @@ const Footer = () => {
         <div className="flex justify-between items-center">
           {/* Left Side: Company Information or Logo */}
           <div>
-            <h2 className="text-2xl font-bold cursor-pointer">Right Technologies</h2>
+            <Link to="/" className="text-2xl font-bold cursor-pointer">
+              Right Technologies
+            </Link>
             <p className="text-sm mt-2">Consultants Private Limited</p>
           </div>
 

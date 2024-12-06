@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
-import { FaSearch } from 'react-icons/fa'; // Importing the magnifying glass icon
+import { Link } from 'react-router-dom';
+import { FaSearch, FaBars, FaTimes } from 'react-icons/fa'; // Icons for menu toggle and search
 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false); // Track dropdown visibility
   const [searchQuery, setSearchQuery] = useState(""); // Track the search input
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Track sidebar visibility
 
   const navLinks = [
     { to: "/", label: "Home" },
@@ -17,29 +18,39 @@ const Navbar = () => {
   ];
 
   const handleMouseEnter = () => {
-    setDropdownOpen(true); // Show dropdown on hover
+    setDropdownOpen(true);
   };
 
   const handleMouseLeave = () => {
-    setDropdownOpen(false); // Hide dropdown when mouse leaves
+    setDropdownOpen(false);
   };
 
   const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value); // Update search input state
+    setSearchQuery(e.target.value);
   };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    console.log("Search Query:", searchQuery); // Handle the search action (update as needed)
+    console.log("Search Query:", searchQuery);
   };
 
   return (
     <div>
-      <nav className="w-full h-[100px] py-4 bg-blue-950 flex items-center justify-between md:px-28 md:px-16 sm:px-7 px-4 z-50">
-        <div
-          className="flex-1 md:flex flex-col md:flex-row gap-x-5 gap-y-2.5 md:items-center md:p-0 p-4 justify-start md:bg-transparent bg-neutral-100 md:shadow-none shadow-md rounded-md"
+      {/* Main Navbar */}
+      <nav className="w-full py-4 bg-blue-950 flex items-center justify-between px-4 md:px-16 z-50">
+        
+
+        {/* Hamburger Icon for Mobile */}
+        <button
+          className="text-white md:hidden"
+          onClick={() => setIsSidebarOpen(true)}
         >
-          <ul className="list-none flex md:items-center items-start gap-x-20 gap-y-2 text-xl text-white font-medium">
+          <FaBars size={24} />
+        </button>
+
+        {/* Desktop Links */}
+        <div className="hidden md:flex flex-1 justify-between items-center">
+          <ul className="list-none flex items-center gap-x-10 text-xl text-white font-medium">
             {navLinks.map((item) => (
               <li
                 key={item.to}
@@ -47,32 +58,91 @@ const Navbar = () => {
                 onMouseEnter={item.dropdown ? handleMouseEnter : null}
                 onMouseLeave={item.dropdown ? handleMouseLeave : null}
               >
-                <div className="flex items-center gap-x-2">
-                  <Link
-                    to={item.to}
-                    className="transition duration-200"
-                  >
-                    {item.label}
-                  </Link>
-                </div>
+                <Link
+                  to={item.to}
+                  className="hover:text-gray-300 transition duration-200"
+                >
+                  {item.label}
+                </Link>
+                {item.dropdown && dropdownOpen && (
+                  <ul className="absolute top-8 left-0 bg-white text-black rounded-md shadow-lg p-2">
+                    <li className="py-1 px-4 hover:bg-gray-200">
+                      <Link to="/services/sub1">Sub Service 1</Link>
+                    </li>
+                    <li className="py-1 px-4 hover:bg-gray-200">
+                      <Link to="/services/sub2">Sub Service 2</Link>
+                    </li>
+                  </ul>
+                )}
               </li>
             ))}
           </ul>
+
+          {/* Search Bar */}
+          <form
+            onSubmit={handleSearchSubmit}
+            className="relative flex items-center"
+          >
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search..."
+              className="w-[200px] md:w-[300px] px-10 py-2 text-black rounded-md outline-none"
+            />
+            <button
+              type="submit"
+              className="absolute left-3 text-gray-500"
+            >
+              <FaSearch />
+            </button>
+          </form>
         </div>
-        {/* Search Bar */}
+      </nav>
+
+      {/* Sidebar for Mobile */}
+      <div
+        className={`fixed inset-y-0 left-0 bg-blue-950 text-white z-50 transform ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } transition-transform duration-300 w-[75%] sm:w-[60%] p-4`}
+      >
+        {/* Close Button */}
+        <button
+          className="text-white text-2xl mb-4"
+          onClick={() => setIsSidebarOpen(false)}
+        >
+          <FaTimes />
+        </button>
+
+        {/* Sidebar Links */}
+        <ul className="flex flex-col gap-y-6 text-xl font-medium">
+          {navLinks.map((item) => (
+            <li
+              key={item.to}
+              onClick={() => setIsSidebarOpen(false)} // Close sidebar on link click
+            >
+              <Link
+                to={item.to}
+                className="hover:text-gray-300 transition duration-200"
+              >
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {/* Search Bar in Sidebar */}
         <form
           onSubmit={handleSearchSubmit}
-          className="relative flex items-center"
+          className="relative mt-8 flex items-center"
         >
-          {/* Search Input */}
           <input
             type="text"
             value={searchQuery}
             onChange={handleSearchChange}
             placeholder="Search..."
-            className="w-[200px] md:w-[300px] px-10 py-2 text-black rounded-md outline-none"
+            className="w-full px-10 py-2 text-black rounded-md outline-none"
           />
-          {/* Search Button */}
           <button
             type="submit"
             className="absolute left-3 text-gray-500"
@@ -80,7 +150,15 @@ const Navbar = () => {
             <FaSearch />
           </button>
         </form>
-      </nav>
+      </div>
+
+      {/* Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
     </div>
   );
 };
